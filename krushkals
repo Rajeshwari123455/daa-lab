@@ -1,0 +1,67 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+// Edge structure to represent graph edges
+struct Edge {
+    int src, dest, weight;
+};
+
+// Function to compare edges by their weight for sorting
+bool compareEdges(const Edge& edge1, const Edge& edge2) {
+    return edge1.weight < edge2.weight;
+}
+
+// Function to find the parent of a vertex in the disjoint set
+int findParent(int vertex, vector<int>& parent) {
+    if (parent[vertex] == -1)
+        return vertex;
+    return findParent(parent[vertex], parent);
+}
+
+// Function to perform union of two disjoint sets
+void unionSets(int parentX, int parentY, vector<int>& parent) {
+    parent[parentX] = parentY;
+}
+
+// Function to find the minimum cost spanning tree using Kruskal's algorithm
+int kruskalMST(vector<Edge>& edges, int V) {
+    vector<int> parent(V, -1);
+    int minCost = 0;
+
+    sort(edges.begin(), edges.end(), compareEdges);
+
+    for (const auto& edge : edges) {
+        int parentX = findParent(edge.src, parent);
+        int parentY = findParent(edge.dest, parent);
+
+        if (parentX != parentY) {
+            minCost += edge.weight;
+            unionSets(parentX, parentY, parent);
+        }
+    }
+
+    return minCost;
+}
+
+int main() {
+    int V, E;
+    cout << "Enter the number of vertices in the graph: ";
+    cin >> V;
+    cout << "Enter the number of edges in the graph: ";
+    cin >> E;
+
+    vector<Edge> edges(E);
+
+    cout << "Enter " << E << " edges in the format (src, dest, weight):" << endl;
+    for (int i = 0; i < E; ++i) {
+        cin >> edges[i].src >> edges[i].dest >> edges[i].weight;
+    }
+
+    int minCost = kruskalMST(edges, V);
+
+    cout << "Minimum Cost Spanning Tree: " << minCost << endl;
+
+    return 0;
+}

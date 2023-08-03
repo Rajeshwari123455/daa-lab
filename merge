@@ -1,0 +1,102 @@
+#include <iostream>
+#include <ctime>
+using namespace std;
+
+// Function to merge two sorted arrays into one sorted array
+void merge(int arr[], int left, int mid, int right, int &basicOperations) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    int* L = new int[n1];
+    int* R = new int[n2];
+
+    for (int i = 0; i < n1; ++i) {
+        L[i] = arr[left + i];
+    }
+
+    for (int j = 0; j < n2; ++j) {
+        R[j] = arr[mid + 1 + j];
+    }
+
+    int i = 0, j = 0, k = left;
+    while (i < n1 && j < n2) {
+        basicOperations++; // Counting basic operations
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+
+    delete[] L;
+    delete[] R;
+}
+
+// Function to perform merge sort
+void mergeSort(int arr[], int left, int right, int &basicOperations) {
+    if (left >= right) {
+        return;
+    }
+
+    int mid = left + (right - left) / 2;
+
+    mergeSort(arr, left, mid, basicOperations);
+    mergeSort(arr, mid + 1, right, basicOperations);
+
+    merge(arr, left, mid, right, basicOperations);
+}
+
+int main() {
+    const int numExperiments = 5;
+
+    for (int experiment = 1; experiment <= numExperiments; ++experiment) {
+        int N;
+        cout << "Experiment " << experiment << endl;
+        cout << "Enter the number of elements in the array: ";
+        cin >> N;
+
+        int* arr = new int[N];
+
+        cout << "Enter " << N << " integer elements: ";
+        for (int i = 0; i < N; ++i) {
+            cin >> arr[i];
+        }
+
+        int basicOperations = 0;
+        clock_t startTime = clock();
+
+        // Call the merge sort function
+        mergeSort(arr, 0, N - 1, basicOperations);
+
+        clock_t endTime = clock();
+        double timeTaken = double(endTime - startTime) / CLOCKS_PER_SEC;
+
+        cout << "Sorted array: ";
+        for (int i = 0; i < N; ++i) {
+            cout << arr[i] << " ";
+        }
+        cout << endl;
+
+        cout << "Time taken for sorting: " << timeTaken << " seconds." << endl;
+        cout << "Number of basic operations executed: " << basicOperations << endl;
+
+        delete[] arr;
+    }
+
+    return 0;
+}
